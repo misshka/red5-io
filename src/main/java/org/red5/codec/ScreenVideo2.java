@@ -186,7 +186,7 @@ public class ScreenVideo2 implements IVideoStreamCodec {
 	}
 
 	/** {@inheritDoc} */
-    public boolean addData(IoBuffer data) {
+    public boolean addData(IoBuffer data, int timestamp) {
 		if (!this.canHandleData(data)) {
 			return false;
 		}
@@ -271,8 +271,24 @@ public class ScreenVideo2 implements IVideoStreamCodec {
 		return result;
 	}
 
+	/** {@inheritDoc} */
+	public int getKeyframeTimestamp() {
+		// need only for frame dropping, but this codec does not support this
+		return 0;
+	}
+
 	public IoBuffer getDecoderConfiguration() {
 		return null;
 	}
     
+	/** {@inheritDoc} */
+	public int getNumInterframes() {
+		return 0;
+	}
+
+	/** {@inheritDoc} */
+	public FrameData getInterframe(int idx) {
+		return null;
+	}
+
 }

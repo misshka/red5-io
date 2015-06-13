@@ -57,14 +57,20 @@ public interface IVideoStreamCodec {
 	/**
 	 * Update the state of the codec with the passed data.
 	 * @param data data to tell the codec we're adding
+	 * @param timestamp timestamp for adding data
 	 * @return true for success. false for error.
 	 */
-	public boolean addData(IoBuffer data);
+	public boolean addData(IoBuffer data, int timestamp);
 
 	/**
 	 * @return the data for a keyframe.
 	 */
 	public IoBuffer getKeyframe();
+
+	/**
+	 * @return the timestamp for a keyframe.
+	 */
+	public int getKeyframeTimestamp();
 
 	/**
 	 * Returns information used to configure the decoder.
@@ -74,31 +80,57 @@ public interface IVideoStreamCodec {
 	public IoBuffer getDecoderConfiguration();
 
 	/**
+	 * @return the number of interframes collected from last keyframe.
+	 */
+	public int getNumInterframes();
+
+	/**
+	 * Gets data of interframe with the specified index.
+	 *
+	 * @param index the index of interframe.
+	 * @return data of the interframe.
+	 */
+	public FrameData getInterframe(int index);
+
+	/**
 	 * Holder for video frame data.
 	 */
 	public final static class FrameData {
 
 		private byte[] frame;
+		private int timestamp;
+
+		/**
+		 * Makes a copy of the incoming bytes and places them in an IoBuffer. No flip or rewind is performed on the source data. Set timestamp to 0.
+		 *
+		 * @param data data
+		 */
+		public void setData(IoBuffer data) {
+			setData(data, 0);
+		}
 
 		/**
 		 * Makes a copy of the incoming bytes and places them in an IoBuffer. No flip or rewind is performed on the source data.
 		 * 
 		 * @param data data
+		 * @param timestamp timestamp of frame
 		 */
-		public void setData(IoBuffer data) {
-			if (frame == null) {
-				frame = new byte[data.limit()];
-			} else {
+		public void setData(IoBuffer data, int timestamp) {
+			if (frame != null) {
 				frame = null;
-				frame = new byte[data.limit()];
 			}
+			frame = new byte[data.limit()];
 			data.get(frame);
+			this.timestamp = timestamp;
 		}
 
 		public IoBuffer getFrame() {
 			return frame == null ? null : IoBuffer.wrap(frame).asReadOnlyBuffer();
 		}
 
-	}
+		public int getTimestamp() {
+			return timestamp;
+		}
 
+	}
 }
