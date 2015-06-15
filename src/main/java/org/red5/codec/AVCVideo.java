@@ -125,7 +125,7 @@ public class AVCVideo implements IVideoStreamCodec {
         			if (interframes.size() < lastInterframe + 1) {
         				interframes.add(new FrameData());
         			}
-                    interframes.get(lastInterframe).setData(data, timestamp);
+					interframes.get(lastInterframe).setData(data, timestamp);
     			} catch (Throwable e) {
     				log.error("Failed to buffer interframe", e);
     			}
