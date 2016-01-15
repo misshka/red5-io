@@ -1,7 +1,7 @@
 /*
  * RED5 Open Source Flash Server - https://github.com/Red5/
  * 
- * Copyright 2006-2015 by respective authors (see below). All rights reserved.
+ * Copyright 2006-2016 by respective authors (see below). All rights reserved.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,28 +29,28 @@ import org.red5.io.utils.HexDump;
 */
 public class AMFIOTest extends AbstractIOTest {
 
-	IoBuffer buf;
+    IoBuffer buf;
 
-	/** {@inheritDoc} */
-	@Override
-	void dumpOutput() {
-		buf.flip();
-		System.err.println(HexDump.formatHexDump(buf.getHexDump()));
-	}
+    /** {@inheritDoc} */
+    @Override
+    void dumpOutput() {
+        buf.flip();
+        System.err.println(HexDump.formatHexDump(buf.getHexDump()));
+    }
 
-	/** {@inheritDoc} */
-	@Override
-	void resetOutput() {
-		setupIO();
-	}
+    /** {@inheritDoc} */
+    @Override
+    void resetOutput() {
+        setupIO();
+    }
 
-	/** {@inheritDoc} */
-	@Override
-	void setupIO() {
-		buf = IoBuffer.allocate(0); // 1kb
-		buf.setAutoExpand(true);
-		in = new Input(buf);
-		out = new Output(buf);
-	}
+    /** {@inheritDoc} */
+    @Override
+    void setupIO() {
+        buf = IoBuffer.allocate(0); // 1kb
+        buf.setAutoExpand(true);
+        in = new Input(buf);
+        out = new Output(buf);
+    }
 
 }

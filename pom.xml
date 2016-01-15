@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <artifactId>red5-io</artifactId>
     <packaging>jar</packaging>
@@ -56,14 +57,15 @@
     </developers>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <spring.version>4.1.7.RELEASE</spring.version>
-        <mina.version>2.0.9</mina.version>
+        <spring.version>4.2.3.RELEASE</spring.version>
+        <mina.version>(2.0.8,2.0.10)</mina.version>
         <slf4j.version>1.7.9</slf4j.version>
         <logback.version>1.1.2</logback.version>
         <quartz.version>2.2.2</quartz.version>
-        <bc.version>1.52</bc.version>
+        <bc.version>1.53</bc.version>
         <junit.version>4.12</junit.version>
-        <isoparser.version>1.0.4.2</isoparser.version>
+        <isoparser.version>1.1.17</isoparser.version>
+        <tika.version>1.11</tika.version>
     </properties>
     <repositories>
         <repository>
@@ -82,7 +84,7 @@
         </repository>
         <repository>
             <id>maven2-repository.jfrog</id>
-	    <url>http://repo.jfrog.org/artifactory/libs-releases/</url>
+            <url>http://repo.jfrog.org/artifactory/libs-releases/</url>
         </repository>
     </repositories>
     <build>
@@ -210,7 +212,6 @@
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
-                <version>2.3.7</version>
                 <extensions>true</extensions>
             </plugin>
             <plugin>
@@ -222,7 +223,7 @@
                     <releaseProfiles>release</releaseProfiles>
                     <goals>deploy</goals>
                 </configuration>
-            </plugin>            
+            </plugin>
         </plugins>
     </build>
     <dependencyManagement>
@@ -322,6 +323,138 @@
             </exclusions>
         </dependency>
         <dependency>
+            <groupId>org.apache.tika</groupId>
+            <artifactId>tika-core</artifactId>
+            <version>${tika.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.tika</groupId>
+            <artifactId>tika-parsers</artifactId>
+            <version>${tika.version}</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>cxf-rt-rs-client</artifactId>
+                    <groupId>org.apache.cxf</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>cdm</artifactId>
+                    <groupId>edu.ucar</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>pdfbox</artifactId>
+                    <groupId>org.apache.pdfbox</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>opennlp-tools</artifactId>
+                    <groupId>org.apache.opennlp</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>junrar</artifactId>
+                    <groupId>com.github.junrar</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>grib</artifactId>
+                    <groupId>edu.ucar</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>sis-metadata</artifactId>
+                    <groupId>org.apache.sis.core</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>sis-utility</artifactId>
+                    <groupId>org.apache.sis.core</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>sis-netcdf</artifactId>
+                    <groupId>org.apache.sis.storage</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>vorbis-java-core</artifactId>
+                    <groupId>org.gagravarr</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>vorbis-java-tika</artifactId>
+                    <groupId>org.gagravarr</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>xz</artifactId>
+                    <groupId>org.tukaani</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>geoapi</artifactId>
+                    <groupId>org.opengis</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>httpservices</artifactId>
+                    <groupId>edu.ucar</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>jackcess</artifactId>
+                    <groupId>com.healthmarketscience.jackcess</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>jackcess-encrypt</artifactId>
+                    <groupId>com.healthmarketscience.jackcess</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>java-libpst</artifactId>
+                    <groupId>com.pff</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>netcdf4</artifactId>
+                    <groupId>edu.ucar</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>bcmail-jdk15on</artifactId>
+                    <groupId>org.bouncycastle</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>bcpkix-jdk15on</artifactId>
+                    <groupId>org.bouncycastle</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>commons-csv</artifactId>
+                    <groupId>org.apache.commons</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>commons-exec</artifactId>
+                    <groupId>org.apache.commons</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>jhighlight</artifactId>
+                    <groupId>org.codelibs</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>jmatio</artifactId>
+                    <groupId>net.sourceforge.jmatio</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>json</artifactId>
+                    <groupId>org.json</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>json-simple</artifactId>
+                    <groupId>com.googlecode.json-simple</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>poi</artifactId>
+                    <groupId>org.apache.poi</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>poi-ooxml</artifactId>
+                    <groupId>org.apache.poi</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>poi-scratchpad</artifactId>
+                    <groupId>org.apache.poi</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>rome</artifactId>
+                    <groupId>rome</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
             <artifactId>commons-beanutils</artifactId>
             <groupId>commons-beanutils</groupId>
             <version>1.9.2</version>
@@ -334,7 +467,7 @@
         <dependency>
             <artifactId>commons-collections</artifactId>
             <groupId>commons-collections</groupId>
-            <version>3.2.1</version>
+            <version>3.2.2</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -455,11 +588,6 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org</groupId>
-            <artifactId>jaudiotagger</artifactId>
-            <version>2.0.4-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>xerces</groupId>

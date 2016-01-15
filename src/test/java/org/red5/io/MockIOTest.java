@@ -1,7 +1,7 @@
 /*
  * RED5 Open Source Flash Server - https://github.com/Red5/
  * 
- * Copyright 2006-2015 by respective authors (see below). All rights reserved.
+ * Copyright 2006-2016 by respective authors (see below). All rights reserved.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,26 +31,26 @@ import org.red5.io.mock.Output;
 */
 public class MockIOTest extends AbstractIOTest {
 
-	protected List<Object> list;
+    protected List<Object> list;
 
-	/** {@inheritDoc} */
-	@Override
-	void setupIO() {
-		list = new LinkedList<Object>();
-		in = new Input(list);
-		out = new Output(list);
-	}
+    /** {@inheritDoc} */
+    @Override
+    void setupIO() {
+        list = new LinkedList<Object>();
+        in = new Input(list);
+        out = new Output(list);
+    }
 
-	/** {@inheritDoc} */
-	@Override
-	void dumpOutput() {
-		System.out.println(Mock.listToString(list));
-	}
+    /** {@inheritDoc} */
+    @Override
+    void dumpOutput() {
+        System.out.println(Mock.listToString(list));
+    }
 
-	/** {@inheritDoc} */
-	@Override
-	void resetOutput() {
-		setupIO();
-	}
+    /** {@inheritDoc} */
+    @Override
+    void resetOutput() {
+        setupIO();
+    }
 
 }
