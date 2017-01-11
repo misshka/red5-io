@@ -1,5 +1,5 @@
 /*
- * RED5 Open Source Flash Server - https://github.com/Red5/
+ * RED5 Open Source Media Server - https://github.com/Red5/
  * 
  * Copyright 2006-2016 by respective authors (see below). All rights reserved.
  * 
@@ -79,6 +79,7 @@ public class HexCharset extends Charset {
      * 
      * @return A new encoder for this charset
      */
+    @Override
     public CharsetEncoder newEncoder() {
         return new Encoder();
     }
@@ -88,6 +89,7 @@ public class HexCharset extends Charset {
      * 
      * @return A new decoder for this charset
      */
+    @Override
     public CharsetDecoder newDecoder() {
         return new Decoder();
     }
@@ -109,6 +111,7 @@ public class HexCharset extends Charset {
      * 
      * @return <tt>true</tt> if, and only if, the given charset is contained in this charset
      */
+    @Override
     public boolean contains(Charset cs) {
         return cs instanceof HexCharset;
     }
@@ -134,6 +137,7 @@ public class HexCharset extends Charset {
          * 
          * @return A coder-result object, either {@link CoderResult#UNDERFLOW} or {@link CoderResult#OVERFLOW}
          */
+        @Override
         protected java.nio.charset.CoderResult implFlush(java.nio.ByteBuffer out) {
             if (!unpaired) {
                 implReset();
@@ -167,6 +171,7 @@ public class HexCharset extends Charset {
          * 
          * @return A coder-result object describing the reason for termination
          */
+        @Override
         public java.nio.charset.CoderResult encodeLoop(java.nio.CharBuffer in, java.nio.ByteBuffer out) {
             while (in.remaining() > 0) {
                 if (out.remaining() <= 0)
@@ -190,6 +195,7 @@ public class HexCharset extends Charset {
          * Clear state
          */
 
+        @Override
         protected void implReset() {
             unpaired = false;
             nyble = 0;
@@ -229,6 +235,7 @@ public class HexCharset extends Charset {
          * 
          * @return A coder-result object describing the reason for termination
          */
+        @Override
         public java.nio.charset.CoderResult decodeLoop(java.nio.ByteBuffer in, java.nio.CharBuffer out) {
             while (in.remaining() > 0) {
                 if (measure != null && charCount >= measure) {
@@ -254,6 +261,7 @@ public class HexCharset extends Charset {
          * The default implementation of this method does nothing. This method should be overridden by decoders that maintain internal state.
          * </p>
          */
+        @Override
         protected void implReset() {
             charCount = 0;
         }

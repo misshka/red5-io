@@ -1,5 +1,5 @@
 /*
- * RED5 Open Source Flash Server - https://github.com/Red5/
+ * RED5 Open Source Media Server - https://github.com/Red5/
  * 
  * Copyright 2006-2016 by respective authors (see below). All rights reserved.
  * 
@@ -99,7 +99,7 @@ public class BufferUtils {
      */
     public final static int put(IoBuffer out, IoBuffer in, int numBytesMax) {
         if (log.isTraceEnabled()) {
-            log.trace("Put\nout buffer: {}\nin buffer: {}\nmax bytes: {}", new Object[] { out, in, numBytesMax });
+            log.trace("Put\nin buffer: {}\nout buffer: {}\nmax bytes: {}", new Object[] { out, in, numBytesMax });
         }
         int numBytesRead = 0;
         if (in != null) {

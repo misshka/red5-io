@@ -1,5 +1,5 @@
 /*
- * RED5 Open Source Flash Server - https://github.com/Red5/
+ * RED5 Open Source Media Server - https://github.com/Red5/
  * 
  * Copyright 2006-2016 by respective authors (see below). All rights reserved.
  * 
@@ -99,11 +99,13 @@ public class ScreenVideo implements IVideoStreamCodec {
     }
 
     /** {@inheritDoc} */
+    @Override
     public String getName() {
         return CODEC_NAME;
     }
 
     /** {@inheritDoc} */
+    @Override
     public void reset() {
         this.blockData = null;
         this.blockSize = null;
@@ -119,6 +121,7 @@ public class ScreenVideo implements IVideoStreamCodec {
     }
 
     /** {@inheritDoc} */
+    @Override
     public boolean canHandleData(IoBuffer data) {
         byte first = data.get();
         boolean result = ((first & 0x0f) == VideoCodec.SCREEN_VIDEO.getId());
@@ -127,6 +130,7 @@ public class ScreenVideo implements IVideoStreamCodec {
     }
 
     /** {@inheritDoc} */
+    @Override
     public boolean canDropFrames() {
         return false;
     }
@@ -134,7 +138,7 @@ public class ScreenVideo implements IVideoStreamCodec {
     /*
      * This uses the same algorithm as "compressBound" from zlib
      */
-    private int maxCompressedSize(int size) {
+    private static int maxCompressedSize(int size) {
         return size + (size >> 12) + (size >> 14) + 11;
     }
 
@@ -173,7 +177,7 @@ public class ScreenVideo implements IVideoStreamCodec {
 
         this.blockCount = xblocks * yblocks;
 
-        int blockSize = this.maxCompressedSize(this.blockWidth * this.blockHeight * 3);
+        int blockSize = maxCompressedSize(this.blockWidth * this.blockHeight * 3);
         int totalBlockSize = blockSize * this.blockCount;
         if (this.totalBlockDataSize != totalBlockSize) {
             log.info("Allocating memory for {} compressed blocks.", this.blockCount);
@@ -189,6 +193,7 @@ public class ScreenVideo implements IVideoStreamCodec {
     }
 
     /** {@inheritDoc} */
+    @Override
     public boolean addData(IoBuffer data, int timestamp) {
         if (!this.canHandleData(data)) {
             return false;
@@ -224,6 +229,7 @@ public class ScreenVideo implements IVideoStreamCodec {
     }
 
     /** {@inheritDoc} */
+    @Override
     public IoBuffer getKeyframe() {
         IoBuffer result = IoBuffer.allocate(1024);
         result.setAutoExpand(true);
@@ -262,16 +268,19 @@ public class ScreenVideo implements IVideoStreamCodec {
 		return 0;
 	}
 
+    @Override
     public IoBuffer getDecoderConfiguration() {
         return null;
     }
 
     /** {@inheritDoc} */
+    @Override
     public int getNumInterframes() {
         return 0;
     }
 
     /** {@inheritDoc} */
+    @Override
     public FrameData getInterframe(int index) {
         return null;
     }

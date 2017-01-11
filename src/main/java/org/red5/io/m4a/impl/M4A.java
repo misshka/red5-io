@@ -1,5 +1,5 @@
 /*
- * RED5 Open Source Flash Server - https://github.com/Red5/
+ * RED5 Open Source Media Server - https://github.com/Red5/
  * 
  * Copyright 2006-2016 by respective authors (see below). All rights reserved.
  * 
@@ -58,6 +58,7 @@ public class M4A implements IM4A {
     /**
      * {@inheritDoc}
      */
+    @Override
     public ITagReader getReader() throws IOException {
         return new M4AReader(file);
     }
@@ -65,10 +66,12 @@ public class M4A implements IM4A {
     /**
      * {@inheritDoc}
      */
+    @Override
     public ITagWriter getWriter() throws IOException {
         return null;
     }
 
+    @Override
     public ITagWriter getAppendWriter() throws IOException {
         return null;
     }

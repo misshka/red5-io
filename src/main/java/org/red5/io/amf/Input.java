@@ -1,5 +1,5 @@
 /*
- * RED5 Open Source Flash Server - https://github.com/Red5/
+ * RED5 Open Source Media Server - https://github.com/Red5/
  * 
  * Copyright 2006-2016 by respective authors (see below). All rights reserved.
  * 
@@ -37,6 +37,7 @@ import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.beanutils.BeanUtilsBean;
 import org.apache.commons.beanutils.PropertyUtilsBean;
 import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.mina.core.buffer.IoBuffer;
 import org.red5.io.amf3.ByteArray;
 import org.red5.io.object.BaseInput;
@@ -62,7 +63,7 @@ import org.w3c.dom.Document;
 @SuppressWarnings("serial")
 public class Input extends BaseInput implements org.red5.io.object.Input {
 
-    protected static Logger log = LoggerFactory.getLogger(Input.class);
+    protected Logger log = LoggerFactory.getLogger(this.getClass());
 
     protected static Map<String, String> classAliases = new HashMap<String, String>(3) {
         {
@@ -96,6 +97,7 @@ public class Input extends BaseInput implements org.red5.io.object.Input {
      * @return One of AMF class constants with type
      * @see org.red5.io.amf.AMF
      */
+    @Override
     public byte readDataType() {
         do {
             // get the data type
@@ -134,14 +136,9 @@ public class Input extends BaseInput implements org.red5.io.object.Input {
                     return (byte) (currentDataType + DataTypes.CUSTOM_AMF_MASK);
                 case AMF.TYPE_AMF3_OBJECT:
                     log.debug("Switch to AMF3");
-                    break;
-                case 0x3f:
-                    // marker, if followed by 0xf0, skip 12 bytes
-                    log.debug("3F! pos: {}", buf.position());
-                    log.debug("Skipping 13 bytes");
-                    buf.skip(13);
+                    return DataTypes.CORE_SWITCH;
             }
-        } while(hasMoreProperties());
+        } while (hasMoreProperties());
         log.trace("No more data types available");
         return DataTypes.CORE_END_OBJECT;
     }
@@ -151,6 +148,7 @@ public class Input extends BaseInput implements org.red5.io.object.Input {
      *
      * @return Object
      */
+    @Override
     public Object readNull() {
         return null;
     }
@@ -160,6 +158,7 @@ public class Input extends BaseInput implements org.red5.io.object.Input {
      *
      * @return boolean
      */
+    @Override
     public Boolean readBoolean() {
         return (buf.get() == AMF.VALUE_TRUE) ? Boolean.TRUE : Boolean.FALSE;
     }
@@ -169,6 +168,7 @@ public class Input extends BaseInput implements org.red5.io.object.Input {
      *
      * @return Number
      */
+    @Override
     public Number readNumber() {
         int remaining = buf.remaining();
         log.debug("readNumber from {} bytes", remaining);
@@ -189,6 +189,7 @@ public class Input extends BaseInput implements org.red5.io.object.Input {
      * 
      * @return String
      */
+    @Override
     public String getString() {
         log.trace("getString - currentDataType: {}", currentDataType);
         byte lastDataType = currentDataType;
@@ -207,6 +208,7 @@ public class Input extends BaseInput implements org.red5.io.object.Input {
      *
      * @return String
      */
+    @Override
     public String readString() {
         int limit = buf.limit();
         int len = 0;
@@ -229,48 +231,17 @@ public class Input extends BaseInput implements org.red5.io.object.Input {
         byte[] str = new byte[len];
         buf.get(str);
         String string = bufferToString(str);
-        //String string = bufferToString(Arrays.copyOfRange(buf.array(), buf.position(), (buf.position() + len)));
-        //buf.skip(len);
         return string;
     }
-
-//    /**
-//     * Returns a string based on the buffer
-//     *
-//     * @param buf
-//     *            Byte buffer with data
-//     * @return String Decoded string
-//     */
-//    public static String getString(IoBuffer buf) {
-//        int len = buf.getUnsignedShort();
-//        log.debug("Length: {} limit: {}", len, buf.limit());
-//        String string = bufferToString(Arrays.copyOfRange(buf.array(), buf.position(), (buf.position() + len)));
-//        buf.skip(len);
-//        return string;
-//    }
-//
-//    /**
-//     * Returns a string based on the buffer
-//     *
-//     * @param buf
-//     *            Byte buffer with data
-//     * @return String Decoded string
-//     */
-//    public static String getString(java.nio.ByteBuffer buf) {
-//        int len = buf.getShort() & 0xffff;
-//        log.debug("Length: {} limit: {}", len, buf.limit());
-//        String string = bufferToString(Arrays.copyOfRange(buf.array(), buf.position(), (buf.position() + len)));
-//        buf.position(buf.position() + len);
-//        return string;
-//    }
 
     /**
      * Converts the bytes into a string.
      * 
-     * @param str string bytes
+     * @param str
+     *            string bytes
      * @return decoded String
      */
-    private final static String bufferToString(byte[] str) {
+    private final String bufferToString(byte[] str) {
         String string = null;
         if (str != null) {
             string = AMF.CHARSET.decode(ByteBuffer.wrap(str)).toString();
@@ -286,6 +257,7 @@ public class Input extends BaseInput implements org.red5.io.object.Input {
      *
      * @return Date Decoded string object
      */
+    @Override
     public Date readDate() {
         /*
          * Date: 0x0B T7 T6 .. T0 Z1 Z2 T7 to T0 form a 64 bit Big Endian number
@@ -303,6 +275,7 @@ public class Input extends BaseInput implements org.red5.io.object.Input {
         return date;
     }
 
+    @Override
     public Object readArray(Type target) {
         log.debug("readArray - target: {}", target);
         Object result = null;
@@ -317,14 +290,14 @@ public class Input extends BaseInput implements org.red5.io.object.Input {
         if (collection.isArray()) {
             result = ArrayUtils.getArray(collection.getComponentType(), count);
         } else {
-        	result = resultCollection;
+            result = resultCollection;
         }
         storeReference(result); //reference should be stored before reading of objects to get correct refIds
         for (int i = 0; i < count; i++) {
             resultCollection.add(Deserializer.deserialize(this, Object.class));
         }
         if (collection.isArray()) {
-        	ArrayUtils.fillArray(collection.getComponentType(), result, resultCollection);
+            ArrayUtils.fillArray(collection.getComponentType(), result, resultCollection);
         }
         return result;
     }
@@ -332,6 +305,7 @@ public class Input extends BaseInput implements org.red5.io.object.Input {
     /**
      * Read key - value pairs. This is required for the RecordSet deserializer.
      */
+    @Override
     public Map<String, Object> readKeyValues() {
         Map<String, Object> result = new HashMap<String, Object>();
         readKeyValues(result);
@@ -354,11 +328,12 @@ public class Input extends BaseInput implements org.red5.io.object.Input {
             if (hasMoreProperties()) {
                 skipPropertySeparator();
             } else {
-            	break;
+                break;
             }
         } while (hasMoreProperties());
     }
 
+    @Override
     public Object readMap() {
         // the maximum number used in this mixed array
         int maxNumber = buf.getInt();
@@ -372,9 +347,7 @@ public class Input extends BaseInput implements org.red5.io.object.Input {
         while (hasMoreProperties()) {
             String key = getString();
             log.debug("key: {}", key);
-            try {
-                Integer.parseInt(key);
-            } catch (NumberFormatException e) {
+            if (!NumberUtils.isParsable(key)) {
                 log.debug("key {} is causing non normal array", key);
                 normalArray = false;
             }
@@ -428,8 +401,12 @@ public class Input extends BaseInput implements org.red5.io.object.Input {
                 className = "org.red5.compatibility." + className;
                 log.debug("Modified classname: {}", className);
             }
-            clazz = Thread.currentThread().getContextClassLoader().loadClass(className);
-            instance = clazz.newInstance();
+            if (!classAllowed(className)) {
+                log.error("Class creation is not allowed {}", className);
+            } else {
+                clazz = Thread.currentThread().getContextClassLoader().loadClass(className);
+                instance = clazz.newInstance();
+            }
         } catch (InstantiationException iex) {
             try {
                 //check for default ctor
@@ -488,7 +465,7 @@ public class Input extends BaseInput implements org.red5.io.object.Input {
             if (hasMoreProperties()) {
                 skipPropertySeparator();
             } else {
-            	break; //hasMoreProperties == false, position moved to +3
+                break; //hasMoreProperties == false, position moved to +3
             }
         }
         return bean;
@@ -501,7 +478,7 @@ public class Input extends BaseInput implements org.red5.io.object.Input {
      */
     protected Map<String, Object> readSimpleObject() {
         log.debug("readSimpleObject");
-        Map<String, Object> result = new ObjectMap<String, Object>();
+        Map<String, Object> result = new ObjectMap<>();
         readKeyValues(result);
         storeReference(result);
         return result;
@@ -512,6 +489,7 @@ public class Input extends BaseInput implements org.red5.io.object.Input {
      *
      * @return Read object
      */
+    @Override
     public Object readObject() {
         String className;
         if (currentDataType == AMF.TYPE_CLASS_OBJECT) {
@@ -527,6 +505,9 @@ public class Input extends BaseInput implements org.red5.io.object.Input {
                 } else if (className.equals("RecordSetPage")) {
                     result = new RecordSetPage(this);
                     storeReference(result);
+                } else if (!classAllowed(className)) {
+                    log.debug("Class creation is not allowed {}", className);
+                    result = readSimpleObject();
                 } else {
                     instance = newInstance(className);
                     if (instance != null) {
@@ -584,6 +565,7 @@ public class Input extends BaseInput implements org.red5.io.object.Input {
      *
      * @return String XML as string
      */
+    @Override
     public Document readXML() {
         final String xmlString = readString();
         Document doc = null;
@@ -601,6 +583,7 @@ public class Input extends BaseInput implements org.red5.io.object.Input {
      *
      * @return Object Custom type object
      */
+    @Override
     public Object readCustom() {
         // return null for now
         return null;
@@ -611,6 +594,7 @@ public class Input extends BaseInput implements org.red5.io.object.Input {
      *
      * @return ByteArray object
      */
+    @Override
     public ByteArray readByteArray() {
         throw new RuntimeException("ByteArray objects not supported with AMF0");
     }
@@ -620,6 +604,7 @@ public class Input extends BaseInput implements org.red5.io.object.Input {
      *
      * @return Vector&lt;Integer&gt; object
      */
+    @Override
     public Vector<Integer> readVectorInt() {
         throw new RuntimeException("Vector objects not supported with AMF0");
     }
@@ -629,6 +614,7 @@ public class Input extends BaseInput implements org.red5.io.object.Input {
      *
      * @return Vector&lt;Long&gt; object
      */
+    @Override
     public Vector<Long> readVectorUInt() {
         throw new RuntimeException("Vector objects not supported with AMF0");
     }
@@ -638,6 +624,7 @@ public class Input extends BaseInput implements org.red5.io.object.Input {
      *
      * @return Vector&lt;Double&gt; object
      */
+    @Override
     public Vector<Double> readVectorNumber() {
         throw new RuntimeException("Vector objects not supported with AMF0");
     }
@@ -647,6 +634,7 @@ public class Input extends BaseInput implements org.red5.io.object.Input {
      *
      * @return Vector&lt;Object&gt; object
      */
+    @Override
     public Vector<Object> readVectorObject() {
         throw new RuntimeException("Vector objects not supported with AMF0");
     }
@@ -656,16 +644,15 @@ public class Input extends BaseInput implements org.red5.io.object.Input {
      *
      * @return Object Read reference to object
      */
+    @Override
     public Object readReference() {
         return getReference(buf.getUnsignedShort());
     }
 
-    /**
-     * Resets map
-     *
-     */
+    /** {@inheritDoc} */
+    @Override
     public void reset() {
-        this.clearReferences();
+        clearReferences();
     }
 
     protected Type getPropertyType(Object instance, String propertyName) {

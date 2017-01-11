@@ -1,5 +1,5 @@
 /*
- * RED5 Open Source Flash Server - https://github.com/Red5/
+ * RED5 Open Source Media Server - https://github.com/Red5/
  * 
  * Copyright 2006-2016 by respective authors (see below). All rights reserved.
  * 
@@ -41,6 +41,7 @@ public class StreamCodecInfo implements IStreamCodecInfo {
     private IVideoStreamCodec videoCodec;
 
     /** {@inheritDoc} */
+    @Override
     public boolean hasAudio() {
         return audio;
     }
@@ -56,6 +57,7 @@ public class StreamCodecInfo implements IStreamCodecInfo {
     }
 
     /** {@inheritDoc} */
+    @Override
     public String getAudioCodecName() {
         if (audioCodec == null) {
             return null;
@@ -64,6 +66,7 @@ public class StreamCodecInfo implements IStreamCodecInfo {
     }
 
     /** {@inheritDoc} */
+    @Override
     public IAudioStreamCodec getAudioCodec() {
         return audioCodec;
     }
@@ -79,6 +82,7 @@ public class StreamCodecInfo implements IStreamCodecInfo {
     }
 
     /** {@inheritDoc} */
+    @Override
     public boolean hasVideo() {
         return video;
     }
@@ -94,6 +98,7 @@ public class StreamCodecInfo implements IStreamCodecInfo {
     }
 
     /** {@inheritDoc} */
+    @Override
     public String getVideoCodecName() {
         if (videoCodec == null) {
             return null;
@@ -102,6 +107,7 @@ public class StreamCodecInfo implements IStreamCodecInfo {
     }
 
     /** {@inheritDoc} */
+    @Override
     public IVideoStreamCodec getVideoCodec() {
         return videoCodec;
     }

@@ -1,5 +1,5 @@
 /*
- * RED5 Open Source Flash Server - https://github.com/Red5/
+ * RED5 Open Source Media Server - https://github.com/Red5/
  * 
  * Copyright 2006-2016 by respective authors (see below). All rights reserved.
  * 
@@ -78,16 +78,19 @@ public class SorensonVideo implements IVideoStreamCodec, IoConstants {
     }
 
     /** {@inheritDoc} */
+    @Override
     public String getName() {
         return CODEC_NAME;
     }
 
     /** {@inheritDoc} */
+    @Override
     public boolean canDropFrames() {
         return true;
     }
 
     /** {@inheritDoc} */
+    @Override
     public void reset() {
 		this.blockData = null;
 		this.blockSize = 0;
@@ -96,6 +99,7 @@ public class SorensonVideo implements IVideoStreamCodec, IoConstants {
 	}
 
     /** {@inheritDoc} */
+    @Override
     public boolean canHandleData(IoBuffer data) {
         if (data.limit() > 0) {
             byte first = data.get();
@@ -106,6 +110,7 @@ public class SorensonVideo implements IVideoStreamCodec, IoConstants {
     }
 
     /** {@inheritDoc} */
+    @Override
     public boolean addData(IoBuffer data, int timestamp) {
         if (data.limit() == 0) {
             return true;
@@ -153,6 +158,7 @@ public class SorensonVideo implements IVideoStreamCodec, IoConstants {
     }
 
     /** {@inheritDoc} */
+    @Override
     public IoBuffer getKeyframe() {
         if (this.dataCount > 0) {
             IoBuffer result = IoBuffer.allocate(this.dataCount);
@@ -164,20 +170,24 @@ public class SorensonVideo implements IVideoStreamCodec, IoConstants {
     }
 
 	/** {@inheritDoc} */
+    @Override
 	public int getKeyframeTimestamp() {
 		return keyframeTimestamp;
 	}
 
+    @Override
     public IoBuffer getDecoderConfiguration() {
         return null;
     }
 
     /** {@inheritDoc} */
+    @Override
     public int getNumInterframes() {
         return numInterframes.get();
     }
 
     /** {@inheritDoc} */
+    @Override
     public FrameData getInterframe(int index) {
         if (index < numInterframes.get()) {
             return interframes.get(index);

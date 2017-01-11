@@ -1,5 +1,5 @@
 /*
- * RED5 Open Source Flash Server - https://github.com/Red5/
+ * RED5 Open Source Media Server - https://github.com/Red5/
  * 
  * Copyright 2006-2016 by respective authors (see below). All rights reserved.
  * 
@@ -109,7 +109,7 @@ public class MP3Reader implements ITagReader, IKeyFrameDataAnalyzer {
     /**
      * Container for metadata and any other tags that should be sent prior to media data.
      */
-    private LinkedList<ITag> firstTags = new LinkedList<ITag>();
+    private LinkedList<ITag> firstTags = new LinkedList<>();
 
     private long fileSize;
 
@@ -233,6 +233,7 @@ public class MP3Reader implements ITagReader, IKeyFrameDataAnalyzer {
      * 
      * @return always returns <code>false</code>
      */
+    @Override
     public boolean hasVideo() {
         return false;
     }
@@ -306,7 +307,7 @@ public class MP3Reader implements ITagReader, IKeyFrameDataAnalyzer {
                 props.put("samplerate", metaData.sampleRate);
             }
             if (metaData.hasCoverImage()) {
-                Map<Object, Object> covr = new HashMap<Object, Object>(1);
+                Map<Object, Object> covr = new HashMap<>(1);
                 covr.put("covr", new Object[] { metaData.getCovr() });
                 props.put("tags", covr);
             }
@@ -336,16 +337,19 @@ public class MP3Reader implements ITagReader, IKeyFrameDataAnalyzer {
     }
 
     /** {@inheritDoc} */
+    @Override
     public IStreamableFile getFile() {
         return null;
     }
 
     /** {@inheritDoc} */
+    @Override
     public int getOffset() {
         return 0;
     }
 
     /** {@inheritDoc} */
+    @Override
     public long getBytesRead() {
         try {
             return fileChannel != null ? fileChannel.position() : 0;
@@ -355,6 +359,7 @@ public class MP3Reader implements ITagReader, IKeyFrameDataAnalyzer {
     }
 
     /** {@inheritDoc} */
+    @Override
     public long getDuration() {
         return duration;
     }
@@ -364,17 +369,20 @@ public class MP3Reader implements ITagReader, IKeyFrameDataAnalyzer {
      * 
      * @return Total readable bytes
      */
+    @Override
     public long getTotalBytes() {
         return fileSize;
     }
 
     /** {@inheritDoc} */
+    @Override
     public boolean hasMoreTags() {
         log.debug("hasMoreTags");
         return fileChannel.isOpen() && frameIndex < frameCount;
     }
 
     /** {@inheritDoc} */
+    @Override
     public ITag readTag() {
         log.debug("readTag");
         try {
@@ -439,6 +447,7 @@ public class MP3Reader implements ITagReader, IKeyFrameDataAnalyzer {
     }
 
     /** {@inheritDoc} */
+    @Override
     public void close() {
         if (posTimeMap != null) {
             posTimeMap.clear();
@@ -452,10 +461,12 @@ public class MP3Reader implements ITagReader, IKeyFrameDataAnalyzer {
     }
 
     /** {@inheritDoc} */
+    @Override
     public void decodeHeader() {
     }
 
     /** {@inheritDoc} */
+    @Override
     public void position(long pos) {
         if (pos == Long.MAX_VALUE) {
             // seek at EOF
@@ -472,6 +483,7 @@ public class MP3Reader implements ITagReader, IKeyFrameDataAnalyzer {
     }
 
     /** {@inheritDoc} */
+    @Override
     public KeyFrameMeta analyzeKeyFrames() {
         log.debug("analyzeKeyFrames");
         if (frameMeta != null) {
@@ -486,7 +498,7 @@ public class MP3Reader implements ITagReader, IKeyFrameDataAnalyzer {
                     // frame data loaded, create other mappings
                     duration = frameMeta.duration;
                     frameMeta.audioOnly = true;
-                    posTimeMap = new HashMap<Long, Float>();
+                    posTimeMap = new HashMap<>();
                     for (int i = 0; i < frameMeta.positions.length; i++) {
                         posTimeMap.put(frameMeta.positions[i], (float) frameMeta.timestamps[i]);
                     }
@@ -501,10 +513,10 @@ public class MP3Reader implements ITagReader, IKeyFrameDataAnalyzer {
             @SuppressWarnings("resource")
             MP3Stream stream = new MP3Stream(fis);
             // frame holder
-            frameList = new LinkedList<AudioFrame>();
+            frameList = new LinkedList<>();
             // position and timestamp lists
-            List<Long> positionList = new ArrayList<Long>();
-            List<Float> timestampList = new ArrayList<Float>();
+            List<Long> positionList = new ArrayList<>();
+            List<Float> timestampList = new ArrayList<>();
             dataRate = 0;
             long rate = 0;
             float time = 0f;
@@ -539,7 +551,7 @@ public class MP3Reader implements ITagReader, IKeyFrameDataAnalyzer {
             log.trace("Finished with frame count: {}", frameCount);
             duration = (long) time;
             dataRate = (int) (rate / frameCount);
-            posTimeMap = new HashMap<Long, Float>();
+            posTimeMap = new HashMap<>();
             frameMeta = new KeyFrameMeta();
             frameMeta.duration = duration;
             frameMeta.positions = new long[positionList.size()];

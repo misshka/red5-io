@@ -1,5 +1,5 @@
 /*
- * RED5 Open Source Flash Server - https://github.com/Red5/
+ * RED5 Open Source Media Server - https://github.com/Red5/
  * 
  * Copyright 2006-2016 by respective authors (see below). All rights reserved.
  * 
@@ -53,16 +53,19 @@ public class AACAudio implements IAudioStreamCodec {
     }
 
     /** {@inheritDoc} */
+    @Override
     public String getName() {
         return CODEC_NAME;
     }
 
     /** {@inheritDoc} */
+    @Override
     public void reset() {
         blockDataAACDCR = null;
     }
 
     /** {@inheritDoc} */
+    @Override
     public boolean canHandleData(IoBuffer data) {
         if (data.limit() == 0) {
             // Empty buffer
@@ -75,32 +78,32 @@ public class AACAudio implements IAudioStreamCodec {
     }
 
     /** {@inheritDoc} */
+    @Override
     public boolean addData(IoBuffer data) {
-        int dataLength = data.limit();
-        if (dataLength > 1) {
-            //ensure we are at the beginning
+        if (data.hasRemaining()) {
+            // mark
+            int start = data.position();
+            // ensure we are at the beginning
             data.rewind();
             byte frameType = data.get();
             log.trace("Frame type: {}", frameType);
             byte header = data.get();
-            //go back to beginning
-            data.rewind();
-            //If we don't have the AACDecoderConfigurationRecord stored...
+            // if we don't have the AACDecoderConfigurationRecord stored
             if (blockDataAACDCR == null) {
-                if ((((frameType & 0xF0) >> 4) == AudioCodec.AAC.getId()) && (header == 0)) {
-                    //go back to beginning
+                if ((((frameType & 0xf0) >> 4) == AudioCodec.AAC.getId()) && (header == 0)) {
+                    // back to the beginning
                     data.rewind();
-                    blockDataAACDCR = new byte[dataLength];
+                    blockDataAACDCR = new byte[data.remaining()];
                     data.get(blockDataAACDCR);
-                    //go back to beginning
-                    data.rewind();
                 }
             }
+            data.position(start);
         }
         return true;
     }
 
     /** {@inheritDoc} */
+    @Override
     public IoBuffer getDecoderConfiguration() {
         if (blockDataAACDCR == null) {
             return null;
@@ -113,7 +116,7 @@ public class AACAudio implements IAudioStreamCodec {
     }
 
     @SuppressWarnings("unused")
-    private long sample2TC(long time, int sampleRate) {
+    private static long sample2TC(long time, int sampleRate) {
         return (time * 1000L / sampleRate);
     }
 
