@@ -99,9 +99,8 @@ public class AVCVideo implements IVideoStreamCodec {
         return result;
     }
 
-    /** {@inheritDoc} */
     @Override
-    public boolean addData(IoBuffer data) {
+    public boolean addData(IoBuffer data, int timestamp) {
         if (data.hasRemaining()) {
             // mark
             int start = data.position();
@@ -127,6 +126,7 @@ public class AVCVideo implements IVideoStreamCodec {
                     }
                     // store last keyframe
                     keyframe.setData(data);
+                    keyframe.setTimestamp(timestamp);
                 } else if (bufferInterframes) {
                     // rewind
                     data.rewind();
@@ -134,9 +134,9 @@ public class AVCVideo implements IVideoStreamCodec {
                         int lastInterframe = numInterframes.getAndIncrement();
                         log.trace("Buffering interframe #{}", lastInterframe);
                         if (lastInterframe < interframes.size()) {
-                            interframes.get(lastInterframe).setData(data);
+                            interframes.get(lastInterframe).setData(data, timestamp);
                         } else {
-                            interframes.add(new FrameData(data));
+                            interframes.add(new FrameData(data, timestamp));
                         }
                     } catch (Throwable e) {
                         log.error("Failed to buffer interframe", e);
@@ -163,6 +163,11 @@ public class AVCVideo implements IVideoStreamCodec {
 
     /** {@inheritDoc} */
     @Override
+	public int getKeyframeTimestamp() {
+		return keyframe.getTimestamp();
+	}
+
+	@Override
     public IoBuffer getDecoderConfiguration() {
         return decoderConfiguration.getFrame();
     }

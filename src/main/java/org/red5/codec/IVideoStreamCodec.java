@@ -61,9 +61,11 @@ public interface IVideoStreamCodec {
      * 
      * @param data
      *            data to tell the codec we're adding
+     * @param timestamp
+     *                 timestamp for adding data
      * @return true for success. false for error
      */
-    public boolean addData(IoBuffer data);
+	public boolean addData(IoBuffer data, int timestamp);
 
     /**
      * Returns keyframe data.
@@ -73,6 +75,13 @@ public interface IVideoStreamCodec {
     public IoBuffer getKeyframe();
 
     /**
+     * Returns the timestamp of last keyframe.
+     *
+	 * @return the timestamp for a keyframe.
+	 */
+	public int getKeyframeTimestamp();
+
+	/**
      * Returns information used to configure the decoder.
      * 
      * @return the data for decoder setup
@@ -101,12 +110,13 @@ public interface IVideoStreamCodec {
     public final static class FrameData {
 
         private byte[] frame;
+		private int timestamp;
 
         public FrameData() {
         }
 
-        public FrameData(IoBuffer data) {
-            setData(data);
+        public FrameData(IoBuffer data, int timestamp) {
+            setData(data, timestamp);
         }
 
         /**
@@ -116,16 +126,36 @@ public interface IVideoStreamCodec {
          *            data
          */
         public void setData(IoBuffer data) {
+			setData(data, 0);
+		}
+
+        /**
+         * Makes a copy of the incoming bytes and places them in an IoBuffer. No flip or rewind is performed on the source data.
+         *
+         * @param data
+         *            data
+         * @param timestamp
+         *                 timestamp of frame
+         */
+        public void setData(IoBuffer data, int timestamp) {
             if (frame != null) {
                 frame = null;
             }
             frame = new byte[data.limit()];
             data.get(frame);
+			this.timestamp = timestamp;
         }
 
         public IoBuffer getFrame() {
             return frame == null ? null : IoBuffer.wrap(frame).asReadOnlyBuffer();
         }
 
+		public int getTimestamp() {
+			return timestamp;
+        }
+
+		public void setTimestamp(int timestamp) {
+			this.timestamp = timestamp;
+        }
     }
 }

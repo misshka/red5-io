@@ -58,6 +58,11 @@ public class SorensonVideo implements IVideoStreamCodec, IoConstants {
     private int blockSize;
 
     /**
+	 * Timestamp of keyframe
+	 */
+	private int keyframeTimestamp;
+
+	/**
      * Storage for frames buffered since last key frame
      */
     private final CopyOnWriteArrayList<FrameData> interframes = new CopyOnWriteArrayList<FrameData>();
@@ -90,6 +95,7 @@ public class SorensonVideo implements IVideoStreamCodec, IoConstants {
         this.blockData = null;
         this.blockSize = 0;
         this.dataCount = 0;
+		this.keyframeTimestamp = 0;
     }
 
     /** {@inheritDoc} */
@@ -105,7 +111,7 @@ public class SorensonVideo implements IVideoStreamCodec, IoConstants {
 
     /** {@inheritDoc} */
     @Override
-    public boolean addData(IoBuffer data) {
+    public boolean addData(IoBuffer data, int timestamp) {
         if (data.limit() == 0) {
             return true;
         }
@@ -121,12 +127,12 @@ public class SorensonVideo implements IVideoStreamCodec, IoConstants {
             // Not a keyframe
             try {
                 int lastInterframe = numInterframes.getAndIncrement();
-                if (frameType != FLAG_FRAMETYPE_DISPOSABLE) {
+                if (lastInterframe != 0 || frameType != FLAG_FRAMETYPE_DISPOSABLE) {
                     log.trace("Buffering interframe #{}", lastInterframe);
                     if (lastInterframe < interframes.size()) {
-                        interframes.get(lastInterframe).setData(data);
+                        interframes.get(lastInterframe).setData(data, timestamp);
                     } else {
-                        interframes.add(new FrameData(data));
+                        interframes.add(new FrameData(data, timestamp));
                     }
                 } else {
                     numInterframes.set(lastInterframe);
@@ -139,6 +145,7 @@ public class SorensonVideo implements IVideoStreamCodec, IoConstants {
         }
         numInterframes.set(0);
         interframes.clear();
+        keyframeTimestamp = 0;
         // Store last keyframe
         this.dataCount = data.limit();
         if (this.blockSize < this.dataCount) {
@@ -147,6 +154,7 @@ public class SorensonVideo implements IVideoStreamCodec, IoConstants {
         }
         data.get(this.blockData, 0, this.dataCount);
         data.rewind();
+        keyframeTimestamp = timestamp;
         return true;
     }
 
@@ -161,6 +169,12 @@ public class SorensonVideo implements IVideoStreamCodec, IoConstants {
         }
         return null;
     }
+
+	/** {@inheritDoc} */
+    @Override
+	public int getKeyframeTimestamp() {
+		return keyframeTimestamp;
+	}
 
     @Override
     public IoBuffer getDecoderConfiguration() {
