@@ -101,7 +101,6 @@ public class AVCVideo extends AbstractVideo {
         return result;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean addData(IoBuffer data) {
         return addData(data, (keyframeTimestamp + 1));
@@ -147,6 +146,9 @@ public class AVCVideo extends AbstractVideo {
                             softReset();
                             break;
                     }
+                    // store last keyframe
+                    keyframe.setData(data);
+                    keyframe.setTimestamp(timestamp);
                     //log.trace("Keyframes: {}", keyframes.size());
                 } else if (bufferInterframes) {
                     //log.trace("Interframe");
@@ -159,9 +161,9 @@ public class AVCVideo extends AbstractVideo {
                         int lastInterframe = numInterframes.getAndIncrement();
                         //log.trace("Buffering interframe #{}", lastInterframe);
                         if (lastInterframe < interframes.size()) {
-                            interframes.get(lastInterframe).setData(data);
+                            interframes.get(lastInterframe).setData(data, timestamp);
                         } else {
-                            interframes.add(new FrameData(data));
+                            interframes.add(new FrameData(data, timestamp));
                         }
                     } catch (Throwable e) {
                         log.error("Failed to buffer interframe", e);
@@ -183,6 +185,17 @@ public class AVCVideo extends AbstractVideo {
 
     /** {@inheritDoc} */
     @Override
+    public IoBuffer getKeyframe() {
+        return keyframe.getFrame();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+	public int getKeyframeTimestamp() {
+		return keyframe.getTimestamp();
+	}
+
+	@Override
     public IoBuffer getDecoderConfiguration() {
         return decoderConfiguration.getFrame();
     }

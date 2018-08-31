@@ -191,7 +191,7 @@ public class ScreenVideo2 extends AbstractVideo {
 
     /** {@inheritDoc} */
     @Override
-    public boolean addData(IoBuffer data) {
+    public boolean addData(IoBuffer data, int timestamp) {
         if (!this.canHandleData(data)) {
             return false;
         }
@@ -260,6 +260,12 @@ public class ScreenVideo2 extends AbstractVideo {
         result.rewind();
         return result;
     }
+
+	/** {@inheritDoc} */
+	public int getKeyframeTimestamp() {
+		// need only for frame dropping, but this codec does not support this
+		return 0;
+	}
 
     @Override
     public FrameData[] getKeyframes() {

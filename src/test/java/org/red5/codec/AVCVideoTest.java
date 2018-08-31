@@ -68,10 +68,11 @@ public class AVCVideoTest {
         data.put((byte) 0x01);
         data.put(RandomStringUtils.random(24).getBytes());
         data.flip();
+        int timestamp = 1;
 
         AVCVideo video = new AVCVideo();
         assertTrue(video.canHandleData(data));
-        assertTrue(video.addData(data));
+        assertTrue(video.addData(data, timestamp++));
         for (int i = 0; i < 10; i++) {
             // interframe
             IoBuffer inter = IoBuffer.allocate(128);
@@ -80,7 +81,7 @@ public class AVCVideoTest {
             inter.put(RandomStringUtils.random(24).getBytes());
             inter.flip();
             // add it
-            assertTrue(video.addData(inter));
+            assertTrue(video.addData(inter, timestamp++));
         }
         log.info("testSimpleFlow end\n");
     }
@@ -120,10 +121,11 @@ public class AVCVideoTest {
         data.put((byte) 0x01);
         data.put(RandomStringUtils.random(24).getBytes());
         data.flip();
+        int timestamp = 1;
 
         AVCVideo video = new AVCVideo();
         assertTrue(video.canHandleData(data));
-        assertTrue(video.addData(data));
+        assertTrue(video.addData(data, timestamp++));
         for (int i = 0; i < 10; i++) {
             // interframe
             IoBuffer inter = IoBuffer.allocate(128);
@@ -133,7 +135,7 @@ public class AVCVideoTest {
             inter.put(RandomStringUtils.random(24).getBytes());
             inter.flip();
             // add it
-            assertTrue(video.addData(inter));
+            assertTrue(video.addData(inter, timestamp++));
         }
         // there is no interframe at 0
         FrameData fd = null;
@@ -151,7 +153,7 @@ public class AVCVideoTest {
         fd = video.getInterframe(10);
         assertNull(fd);
         // re-add the key
-        assertTrue(video.addData(data));
+        assertTrue(video.addData(data, timestamp++));
         for (int i = 0; i < 4; i++) {
             // interframe
             IoBuffer inter = IoBuffer.allocate(128);
@@ -161,7 +163,7 @@ public class AVCVideoTest {
             inter.put(RandomStringUtils.random(24).getBytes());
             inter.flip();
             // add it
-            assertTrue(video.addData(inter));
+            assertTrue(video.addData(inter, timestamp++));
         }
         // verify
         for (int i = 0; i < 4; i++) {
