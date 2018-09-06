@@ -73,5 +73,11 @@ public class AbstractVideo implements IVideoStreamCodec, IoConstants {
     public FrameData getInterframe(int idx) {
         return null;
     }
+    
+    /** {@inheritDoc} */
+	public int getKeyframeTimestamp() {
+		// need only for frame dropping, but this codec does not support this
+		return 0;
+	}
 
 }
