@@ -57,6 +57,9 @@ public class AVCVideo extends AbstractVideo {
      * Whether or not to buffer interframes
      */
     private boolean bufferInterframes = true;
+	
+    /** Last keyframe found */
+    private FrameData keyframe;
 
     /** Constructs a new AVCVideo. */
     public AVCVideo() {
@@ -78,6 +81,7 @@ public class AVCVideo extends AbstractVideo {
     /** {@inheritDoc} */
     @Override
     public void reset() {
+    	keyframe = new FrameData();
         decoderConfiguration = new FrameData();
         softReset();
     }
@@ -101,7 +105,7 @@ public class AVCVideo extends AbstractVideo {
         return result;
     }
 
-    @Override
+    
     public boolean addData(IoBuffer data) {
         return addData(data, (keyframeTimestamp + 1));
     }
