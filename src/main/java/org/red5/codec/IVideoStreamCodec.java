@@ -61,17 +61,6 @@ public interface IVideoStreamCodec {
      * 
      * @param data
      *            data to tell the codec we're adding
-     * @param timestamp
-     *                 timestamp for adding data
-     * @return true for success. false for error
-     */
-	public boolean addData(IoBuffer data, int timestamp);
-
-    /**
-     * Update the state of the codec with the passed data.
-     * 
-     * @param data
-     *            data to tell the codec we're adding
      * @param timestamp time associated with the data
      * @return true for success. false for error
      */
