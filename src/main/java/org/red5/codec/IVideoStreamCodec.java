@@ -124,6 +124,10 @@ public interface IVideoStreamCodec {
         public FrameData(IoBuffer data, int timestamp) {
             setData(data, timestamp);
         }
+	
+    	public FrameData(IoBuffer data) {
+            setData(data);
+        }
 
         /**
          * Makes a copy of the incoming bytes and places them in an IoBuffer. No flip or rewind is performed on the source data.
